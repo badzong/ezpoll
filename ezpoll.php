@@ -61,6 +61,15 @@ function ezpoll_success() {
     <?php
 }
 
+function ezpoll_delete_success() {
+    global $wpdb;
+    ?>
+    <div class="notice notice-success is-dismissible">
+        <p><?php _e( "Poll deleted." ); ?></p>
+    </div>
+    <?php
+}
+
 function ezpoll_overview() {
  global $wpdb;
  $paginate_by = 50;
@@ -180,7 +189,7 @@ function ezpoll_overview() {
             </strong>
             <div class="row-actions">
               <span class="edit"><a href="?page=ezpoll_edit&ezpoll_id=<?php echo $poll->id; ?>">Bearbeiten</a></span> | 
-              <span class="delete"><a class="submitdelete" href="">Löschen</a>
+              <span class="delete"><a class="submitdelete" href="?page=ezpoll_delete&ezpoll_id=<?php echo $poll->id; ?>">Löschen</a>
             </div>
           </td>
           <td class="has-row-actions">
@@ -262,6 +271,7 @@ function ezpoll_create() {
   if ($wpdb->replace( $table_name, $item )) {
     add_action( 'admin_notices', 'ezpoll_success' );
     do_action( 'admin_notices' );
+    return ezpoll_overview();
   }
  }  
 ?>
@@ -300,4 +310,34 @@ function ezpoll_create() {
     </form>
 
 </div>
-<?php } ?>
+<?php }
+
+function ezpoll_delete() {
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'ezpoll';
+
+  if (!isset($_GET['ezpoll_id']) || empty($_GET['ezpoll_id']) || !preg_match('/^[0-9]+$/', $_GET['ezpoll_id'])) {
+    wp_die( __( 'Invalid poll id supplied' ) );
+  }
+  $poll_id = $_GET['ezpoll_id'];
+
+  $poll = $wpdb->get_row( "SELECT * FROM $table_name WHERE id = $poll_id" );
+  if (!$poll) {
+    wp_die( __( 'Invalid poll id supplied' ) );
+  }
+
+  if (isset($_POST['ezpoll_id']) && !empty($_POST['ezpoll_id']) && $_POST['ezpoll_id'] == $poll_id) {
+    $wpdb->delete( $table_name, array( 'ID' => $poll_id ) );
+    add_action( 'admin_notices', 'ezpoll_delete_success' );
+    do_action( 'admin_notices' );
+    return ezpoll_overview();
+  }
+
+  ?>
+  <h1>Poll: <?php echo $poll->poll; ?></h1> 
+  <p><?php echo $poll->answer_count; ?> Antworten</p>
+  <form method="post">
+    <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>"/>
+    <?php wp_nonce_field(); submit_button('Delete'); ?>
+  </form>
+  <?php } ?>
