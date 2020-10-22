@@ -1,2 +1,2 @@
-# ezpolls
+# ezpoll
 Simplistic poll plugin for Wordpress
