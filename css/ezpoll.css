@@ -1,0 +1,62 @@
+.ezpoll {
+  border-bottom: solid 1px rgb(197, 197, 197);
+  margin: 20px 0;
+  padding: 10px 0;
+}
+
+.ezpoll>h4 {
+  color: #fff;
+  font-size: 1.125rem;
+  background: rgb(1, 62, 131);
+  background: var(--color-blue-dark);
+  padding-left: .5em;
+  font-weight: 600;
+}
+
+.ezpoll>p {
+  font-weight: 600;
+  margin: 10px 0 15px 0;
+  padding: 0;
+}
+
+.ezpoll-answer {
+  display: flex;
+}
+
+.ezpoll-label {
+  width: 10%;
+  min-width: 80px;
+  color: rgb(1, 62, 131);
+  color: var(--color-blue-dark);
+  font-weight: 600;  
+}
+
+.ezpoll-chart {
+  position: relative;
+  width: 100%;
+}
+
+.ezpoll-bar {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  height: 75%;
+  background: rgb(1, 62, 131);
+  background: var(--color-blue-dark);
+}
+
+.ezpoll-value {
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  text-align: center;
+  font-size: .6em;
+  font-weight: 600;
+  color: #fff;
+}
+
+.ezpoll-participants {
+  margin-top: 10px;
+}

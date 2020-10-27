@@ -51,6 +51,11 @@ function ezpoll_menu() {
  add_submenu_page( null, 'Delete Poll', 'Delete Poll', 'manage_options', 'ezpoll_delete', 'ezpoll_delete');
 }
 
+add_action('wp_enqueue_scripts','ezpoll_scripts');
+function ezpoll_scripts(){
+    wp_enqueue_style( 'ezpoll', plugins_url( 'css/ezpoll.css' , __FILE__ ) );
+}
+
 function ezpoll_success() {
     global $wpdb;
     $id = $wpdb->insert_id;
@@ -341,3 +346,131 @@ function ezpoll_delete() {
     <?php wp_nonce_field(); submit_button('Delete'); ?>
   </form>
   <?php } ?>
+
+<?php
+
+function register_session(){
+    if( !session_id() ) {
+        session_start();
+    }
+}
+add_action('init','register_session');
+
+function random_id() {
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $max = strlen($chars) - 1;
+    $id = '';
+    for ($i = 0; $i < 16; $i++) {
+        $id .= $chars[rand(0, $max)];
+    }
+    return $id;
+}
+
+add_action( 'admin_post_ezpoll_form_data', 'ezpoll_form_data' );
+function ezpoll_form_data() {
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'ezpoll';
+
+  foreach(array('ezpoll_id', 'ezpoll_answer') as $key) {
+    if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]$/', $_POST[$key])) {
+      exit;
+      wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+    }
+  }
+
+  $poll_id = $_POST['ezpoll_id'];
+  $poll = $wpdb->get_row( "SELECT * FROM $table_name WHERE id = $poll_id", ARRAY_A );
+  if (!$poll) {
+    exit;
+    wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+  }
+
+  $answer = $_POST['ezpoll_answer'];
+  if ($answer < 1 || $answer > 5) {
+    exit;
+    wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+  }
+
+  $choice = 'choice' . $answer;
+  if (!$poll[$choice]) {
+    wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+  }
+
+  if (!isset($_SESSION['ezpoll']) || empty($_SESSION['ezpoll'])) {
+    wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+  }
+
+  if (in_array($poll_id, $_SESSION['ezpoll'])) {
+    wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+  }
+
+  array_push($_SESSION['ezpoll'], $poll_id);
+  $answer = 'answer' . $answer;
+  
+  $wpdb->query( "UPDATE $table_name SET $answer = $answer + 1, answer_count = answer_count + 1 WHERE ID = $poll_id ");
+
+  wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+}
+
+
+add_shortcode('ezpoll', function ($attrs) {
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'ezpoll';
+
+  if (!isset($attrs['id']) || empty($attrs['id']) || !preg_match('/^[0-9]+$/', $attrs['id'])) {
+    return '<p class="error">Invalid ID</p>';
+  }
+
+  $poll_id = $attrs['id'];
+  $poll = $wpdb->get_row( "SELECT * FROM $table_name WHERE id = $poll_id" );
+  if (!$poll) {
+    return "<p class=\"error\">Poll id=$poll_id not found</p>";
+  }
+
+  if (!isset($_SESSION['ezpoll']) || empty($_SESSION['ezpoll'])) {
+    $_SESSION['ezpoll'] = array(0);
+  }
+
+  $show_results = in_array($poll_id, $_SESSION['ezpoll']) && $poll->answer_count > 0;
+  if ($poll->answer_count > 0) {
+    $results = array(
+      round($poll->answer1 / $poll->answer_count * 100),
+      round($poll->answer2 / $poll->answer_count * 100),
+      round($poll->answer3 / $poll->answer_count * 100),
+      round($poll->answer4 / $poll->answer_count * 100),
+      round($poll->answer5 / $poll->answer_count * 100),
+    );
+  }
+?>
+<div class="ezpoll">
+  <h4>Umfrage</h4>
+  <p><?php echo $poll->poll; ?><ph4>
+  <div>
+  <?php
+    if ($poll->choice1) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice1</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[0]%\">$results[0]%</div><div class=\"ezpoll-bar\" style=\"width: $results[0]%\"></div></div></div>"; }
+    if ($poll->choice2) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice2</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[1]%\">$results[1]%</div><div class=\"ezpoll-bar\" style=\"width: $results[1]%\"></div></div></div>"; }
+    if ($poll->choice3) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice3</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[2]%\">$results[2]%</div><div class=\"ezpoll-bar\" style=\"width: $results[2]%\"></div></div></div>"; }
+    if ($poll->choice4) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice4</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[3]%\">$results[3]%</div><div class=\"ezpoll-bar\" style=\"width: $results[3]%\"></div></div></div>"; }
+    if ($poll->choice5) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice5</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[4]%\">$results[4]%</div><div class=\"ezpoll-bar\" style=\"width: $results[4]%\"></div></div></div>"; }
+  ?>
+  </div>
+  <div class="ezpoll-participants"><?php echo $poll->answer_count < 10? '< 10': $poll->answer_count; ?> Personen haben an der Umfrage teilgenommen</div>
+</div>
+<?php
+  if ($show_results): ?>
+  <?php else: ?>
+  <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
+    <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
+  <?php
+    if ($poll->choice1) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"1\" required> <label>$poll->choice1</label></div>"; }
+    if ($poll->choice2) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"2\" required> <label>$poll->choice2</label></div>"; }
+    if ($poll->choice3) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"3\" required> <label>$poll->choice3</label></div>"; }
+    if ($poll->choice4) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"4\" required> <label>$poll->choice4</label></div>"; }
+    if ($poll->choice5) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"5\" required> <label>$poll->choice5</label></div>"; }
+    wp_nonce_field();
+  ?>
+  <button type="submit">Weiter</button>
+  </form>
+  <?php endif; ?>
+</div>
+<?php }); ?>
