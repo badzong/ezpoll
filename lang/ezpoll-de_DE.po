@@ -36,15 +36,15 @@ msgid "Polls"
 msgstr "Umfragen"
 
 #: ezpoll.php:56
-msgid "Create Poll"
+msgid "Create poll"
 msgstr "Neue Umfrage"
 
 #: ezpoll.php:57
-msgid "Edit Poll"
+msgid "Edit poll"
 msgstr "Umfrage bearbeiten"
 
 #: ezpoll.php:58
-msgid "Delete Poll"
+msgid "Delete poll"
 msgstr "Umfrage löschen"
 
 #: ezpoll.php:83
@@ -83,10 +83,6 @@ msgstr "Ungültige ID"
 #: template/frontend.php:2
 msgid "Poll"
 msgstr "Umfrage"
-
-#: template/admin-list.php:3
-msgid "Create poll"
-msgstr "Umfrage erstellen"
 
 #: template/admin-list.php:7
 msgid "Records"

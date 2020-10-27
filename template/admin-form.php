@@ -1,5 +1,11 @@
 <div class="wrap">
-  <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+  <h1>
+    <?php if ($edit): ?>
+      <?php _e('Edit poll', 'ezpoll'); ?>
+    <?php else: ?>
+      <?php _e('Create poll', 'ezpoll'); ?>
+    <?php endif; ?>
+  </h1>
   <form method="post">
     <div>
       <table class="form-table" role="presentation" id="createuser">

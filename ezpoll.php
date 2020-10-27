@@ -53,8 +53,8 @@ add_action('admin_menu', 'ezpoll_menu');
 function ezpoll_menu()
 {
     add_menu_page(__('Polls', 'ezpoll'), __('Polls', 'ezpoll'), 'manage_options', 'ezpoll_menu', 'ezpoll_overview', 'dashicons-chart-pie', 40);
-    add_submenu_page('ezpoll_menu', __('Create Poll', 'ezpoll'), __('Create Poll', 'ezpoll'), 'manage_options', 'ezpoll_create', 'ezpoll_create', 1);
-    add_submenu_page(null, __('Edit Poll', 'ezpoll'), __('Edit Poll', 'ezpoll'), 'manage_options', 'ezpoll_edit', 'ezpoll_create');
+    add_submenu_page('ezpoll_menu', __('Create poll', 'ezpoll'), __('Create poll', 'ezpoll'), 'manage_options', 'ezpoll_create', 'ezpoll_create', 1);
+    add_submenu_page(null, __('Edit poll', 'ezpoll'), __('Edit poll', 'ezpoll'), 'manage_options', 'ezpoll_edit', 'ezpoll_create');
     add_submenu_page(null, __('Delete Poll', 'ezpoll'), __('Delete Poll', 'ezpoll'), 'manage_options', 'ezpoll_delete', 'ezpoll_delete');
 }
 
@@ -138,9 +138,11 @@ function ezpoll_create()
 
     $table_name = $wpdb->prefix . 'ezpoll';
 
+    $edit = false;
     if (isset($_GET['ezpoll_id']) && !empty($_GET['ezpoll_id'])) {
         $ezpoll_id = $_GET['ezpoll_id'];
         $item = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $ezpoll_id", ARRAY_A);
+    	$edit = true;
     } else {
         $item = array(
         'poll' => '',
