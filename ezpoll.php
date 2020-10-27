@@ -114,121 +114,7 @@ function ezpoll_overview() {
  $poll_count = $wpdb->get_var( "SELECT count(*) FROM $table_name" );
  $pages = intdiv($poll_count, $paginate_by) + ($poll_count % $paginate_by ? 1: 0);
  
- ?>
- <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
-    <a href="?page=ezpoll_create" class="page-title-action">Neu hinzufügen</a>
-    <hr class="wp-header-end">
-
-    <div class="tablenav-pages alignright">
-      <span class="displaying-num"><?php echo $poll_count; ?> Einträge</span>
-      <span class="pagination-links">
-        <?php if ($page == 1): ?>
-          <span class="tablenav-pages-navspan button disabled" aria-hidden="true">«</span>
-          <span class="tablenav-pages-navspan button disabled" aria-hidden="true">‹</span>
-        <?php else: ?>
-          <a class="next-page button" href="?page=ezpoll_menu&order_by=<?php echo $order_by; ?>--<?php echo $order_dir; ?>&paged=1">
-            <span class="screen-reader-text">Erste Seite</span><span aria-hidden="true">«</span>
-          </a>
-          <a class="next-page button" href="?page=ezpoll_menu&order_by=<?php echo $order_by; ?>--<?php echo $order_dir; ?>&paged=<?php echo $page - 1; ?>">
-            <span class="screen-reader-text">Vorherige Seite</span><span aria-hidden="true">‹</span>
-          </a>
-        <?php endif ?>
-        <span class="paging-input">
-          <label for="current-page-selector" class="screen-reader-text">Aktuelle Seite</label>
-          <input class="current-page" id="current-page-selector" type="text" name="paged" value="<?php echo $page; ?>" size="2" aria-describedby="table-paging">
-          <span class="tablenav-paging-text"> von <span class="total-pages"><?php echo $pages ?></span></span>
-        </span>
-        <?php if ($page == $pages): ?>
-          <span class="tablenav-pages-navspan button disabled" aria-hidden="true">›</span>
-          <span class="tablenav-pages-navspan button disabled" aria-hidden="true">»</span>
-        <?php else: ?>
-          <a class="next-page button" href="?page=ezpoll_menu&order_by=<?php echo $order_by; ?>--<?php echo $order_dir; ?>&paged=<?php echo $page + 1; ?>">
-            <span class="screen-reader-text">Nächste Seite</span><span aria-hidden="true">›</span>
-          </a>
-          <a class="next-page button" href="?page=ezpoll_menu&order_by=<?php echo $order_by; ?>--<?php echo $order_dir; ?>&paged=<?php echo $pages; ?>">
-            <span class="screen-reader-text">Letzte Seite</span><span aria-hidden="true">»</span>
-          </a>
-        <?php endif ?>
-      </span>
-    </div>
-
-    <table class="wp-list-table widefat fixed striped table-view-list users">
-      <thead>
-        <tr>
-          <th scope="col" id="ezpoll_date" class="manage-column sortable <?php echo $order_by == 'date' && $order_dir == 'ASC'? 'asc': 'desc'; ?>">
-            <a href="?page=ezpoll_menu&order_by=created--<?php echo $order_by == 'created' && $order_dir == 'ASC'? 'DESC': 'ASC'; ?>">
-              <span>Date</span><span class="sorting-indicator"></span>
-            </a>
-          </th>
-          <th scope="col" id="ezpoll_poll" class="manage-column sortable <?php echo $order_by == 'poll' && $order_dir == 'ASC'? 'asc': 'desc'; ?>">
-            <a href="?page=ezpoll_menu&order_by=poll--<?php echo $order_by == 'poll' && $order_dir == 'ASC'? 'DESC': 'ASC'; ?>">
-              <span>Poll</span><span class="sorting-indicator"></span>
-            </a>
-          </th>
-          <th scope="col" id="ezpoll_results" class="manage-column sortable <?php echo $order_by == 'answer_count' && $order_dir == 'ASC'? 'asc': 'desc'; ?>">
-            <a href="?page=ezpoll_menu&order_by=answer_count--<?php echo $order_by == 'answer_count' && $order_dir == 'ASC'? 'DESC': 'ASC'; ?>">
-              <span>Results</span><span class="sorting-indicator"></span>
-            </a>
-          </th>
-        </tr>
-      </thead>
-      <tbody id="the-list">
-        <?php foreach ( $polls as $poll ): ?>
-        <tr id="poll-<?php echo $poll->id ?>">
-          <td class="has-row-actions">
-            <strong>
-              <a href="?page=ezpoll_edit&ezpoll_id=<?php echo $poll->id; ?>" class="edit">
-                <span><?php $poll_created = DateTime::createFromFormat('Y-m-d H:i:s', $poll->created); echo $poll_created->format($date_format); ?></span>
-              </a>
-            </strong>
-            <div class="row-actions">
-              <span><strong style="color: #555">[ezpoll id="<?php echo $poll->id; ?>]</strong></span>
-            </div>
-          </td>
-          <td class="has-row-actions column-primary">
-            <strong>
-              <a href="?page=ezpoll_edit&ezpoll_id=<?php echo $poll->id; ?>" class="edit">
-                <span><?php echo $poll->poll; ?></span>
-              </a>
-            </strong>
-            <div class="row-actions">
-              <span class="edit"><a href="?page=ezpoll_edit&ezpoll_id=<?php echo $poll->id; ?>">Bearbeiten</a></span> | 
-              <span class="delete"><a class="submitdelete" href="?page=ezpoll_delete&ezpoll_id=<?php echo $poll->id; ?>">Löschen</a>
-            </div>
-          </td>
-          <td class="has-row-actions">
-            <strong>
-              <span><?php echo $poll->answer_count; ?></span>
-            </strong>
-            <div class="row-actions">
-              <?php if ($poll->answer_count > 0): ?>
-                <strong style="color: #555">
-                  <?php if ($poll->choice1) printf("%s (%.1f%%)", $poll->choice1, round(100.0*$poll->answer1/$poll->answer_count, 1)); ?>
-                  <?php if ($poll->choice2) printf("| %s (%.1f%%)", $poll->choice2, round(100.0*$poll->answer2/$poll->answer_count, 1)); ?>
-                  <?php if ($poll->choice3) printf("| %s (%.1f%%)", $poll->choice3, round(100.0*$poll->answer3/$poll->answer_count, 1)); ?>
-                  <?php if ($poll->choice4) printf("| %s (%.1f%%)", $poll->choice4, round(100.0*$poll->answer4/$poll->answer_count, 1)); ?>
-                  <?php if ($poll->choice5) printf("| %s (%.1f%%)", $poll->choice5, round(100.0*$poll->answer5/$poll->answer_count, 1)); ?>
-                </strong>
-              <?php else: ?>
-                <strong style="color: #555">
-                  <?php if ($poll->choice1) echo $poll->choice1; ?>
-                  <?php if ($poll->choice2) echo '| ' . $poll->choice2; ?>
-                  <?php if ($poll->choice3) echo '| ' . $poll->choice3; ?>
-                  <?php if ($poll->choice4) echo '| ' . $poll->choice4; ?>
-                  <?php if ($poll->choice5) echo '| ' . $poll->choice5; ?>
-                </strong>
-              <?php endif ?>
-            </div>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-      <tfoot>
-      </tfoot>
-    </table>
- </div>
-<?php
+ include plugin_dir_path(__FILE__) . 'template/admin-list.php';
 }
 
 function ezpoll_create() {
@@ -279,43 +165,9 @@ function ezpoll_create() {
     return ezpoll_overview();
   }
  }  
-?>
- <div class="wrap">
-    <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-    <form method="post">
-        <div>
-            <table class="form-table" role="presentation" id="createuser">
-                <tr class="form-field form-required">
-                    <th><label>Poll</label></th>
-                    <td><input type="text" name="ezpoll-poll" value="<?php echo $item['poll'] ?>"/></td>
-                </tr>
-                <tr class="form-field form-required">
-                    <th><label>#1</label></th>
-                    <td><input type="text" name="ezpoll-choice1" value="<?php echo $item['choice1'] ?>"/></td>
-                </tr>
-                <tr class="form-field form-required">
-                    <th><label>#2</label></th>
-                    <td><input type="text" name="ezpoll-choice2" value="<?php echo $item['choice2'] ?>"/></td>
-                </tr>
-                <tr class="form-field">
-                    <th><label>#3</label></th>
-                    <td><input type="text" name="ezpoll-choice3" value="<?php echo $item['choice3'] ?>"/></td>
-                </tr>
-                <tr class="form-field">
-                    <th><label>#4</label></th>
-                    <td><input type="text" name="ezpoll-choice4" value="<?php echo $item['choice4'] ?>"/></td>
-                </tr>
-                <tr class="form-field">
-                    <th><label>#5</label></th>
-                    <td><input type="text" name="ezpoll-choice5" value="<?php echo $item['choice5'] ?>"/></td>
-                </tr>
-            </table>
-        </div>
-        <?php wp_nonce_field(); submit_button(); ?>
-    </form>
 
-</div>
-<?php }
+ include plugin_dir_path(__FILE__) . 'template/admin-form.php';
+}
 
 function ezpoll_delete() {
   global $wpdb;
@@ -441,36 +293,6 @@ add_shortcode('ezpoll', function ($attrs) {
       round($poll->answer5 / $poll->answer_count * 100),
     );
   }
+ include plugin_dir_path(__FILE__) . 'template/frontend.php';
+});
 ?>
-<div class="ezpoll">
-  <h4>Umfrage</h4>
-  <p><?php echo $poll->poll; ?><ph4>
-  <div>
-  <?php
-    if ($poll->choice1) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice1</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[0]%\">$results[0]%</div><div class=\"ezpoll-bar\" style=\"width: $results[0]%\"></div></div></div>"; }
-    if ($poll->choice2) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice2</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[1]%\">$results[1]%</div><div class=\"ezpoll-bar\" style=\"width: $results[1]%\"></div></div></div>"; }
-    if ($poll->choice3) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice3</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[2]%\">$results[2]%</div><div class=\"ezpoll-bar\" style=\"width: $results[2]%\"></div></div></div>"; }
-    if ($poll->choice4) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice4</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[3]%\">$results[3]%</div><div class=\"ezpoll-bar\" style=\"width: $results[3]%\"></div></div></div>"; }
-    if ($poll->choice5) { echo "<div class=\"ezpoll-answer\"><div class=\"ezpoll-label\">$poll->choice5</div><div class=\"ezpoll-chart\"><div class=\"ezpoll-value\" style=\"width: $results[4]%\">$results[4]%</div><div class=\"ezpoll-bar\" style=\"width: $results[4]%\"></div></div></div>"; }
-  ?>
-  </div>
-  <div class="ezpoll-participants"><?php echo $poll->answer_count < 10? '< 10': $poll->answer_count; ?> Personen haben an der Umfrage teilgenommen</div>
-</div>
-<?php
-  if ($show_results): ?>
-  <?php else: ?>
-  <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
-    <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
-  <?php
-    if ($poll->choice1) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"1\" required> <label>$poll->choice1</label></div>"; }
-    if ($poll->choice2) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"2\" required> <label>$poll->choice2</label></div>"; }
-    if ($poll->choice3) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"3\" required> <label>$poll->choice3</label></div>"; }
-    if ($poll->choice4) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"4\" required> <label>$poll->choice4</label></div>"; }
-    if ($poll->choice5) { echo "<div><input type=\"radio\" name=\"ezpoll_answer\" value=\"5\" required> <label>$poll->choice5</label></div>"; }
-    wp_nonce_field();
-  ?>
-  <button type="submit">Weiter</button>
-  </form>
-  <?php endif; ?>
-</div>
-<?php }); ?>
