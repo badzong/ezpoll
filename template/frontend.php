@@ -66,19 +66,19 @@
     <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
       <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
       <?php if ($poll->choice1): ?>
-        <div><input type="radio" name="ezpoll_answer" value="1" required> <label><?php echo $poll->choice1; ?></label></div>
+        <div><input type="radio" name="ezpoll_answer" value="1" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice1; ?></label></div>
       <?php endif; ?>
       <?php if ($poll->choice2): ?>
-        <div><input type="radio" name="ezpoll_answer" value="2" required> <label><?php echo $poll->choice2; ?></label></div>
+        <div><input type="radio" name="ezpoll_answer" value="2" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice2; ?></label></div>
       <?php endif; ?>
       <?php if ($poll->choice3): ?>
-        <div><input type="radio" name="ezpoll_answer" value="3" required> <label><?php echo $poll->choice3; ?></label></div>
+        <div><input type="radio" name="ezpoll_answer" value="3" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice3; ?></label></div>
       <?php endif; ?>
       <?php if ($poll->choice4): ?>
-        <div><input type="radio" name="ezpoll_answer" value="4" required> <label><?php echo $poll->choice4; ?></label></div>
+        <div><input type="radio" name="ezpoll_answer" value="4" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice4; ?></label></div>
       <?php endif; ?>
       <?php if ($poll->choice5): ?>
-        <div><input type="radio" name="ezpoll_answer" value="5" required> <label><?php echo $poll->choice5; ?></label></div>
+        <div><input type="radio" name="ezpoll_answer" value="5" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice5; ?></label></div>
       <?php endif; ?>
       <?php wp_nonce_field(); ?>
       <button type="submit">Weiter</button>

@@ -293,6 +293,9 @@ add_shortcode('ezpoll', function ($attrs) {
       round($poll->answer5 / $poll->answer_count * 100),
     );
   }
- include plugin_dir_path(__FILE__) . 'template/frontend.php';
+
+  ob_start();
+  include plugin_dir_path(__FILE__) . 'template/frontend.php';
+  return ob_get_clean();
 });
 ?>
