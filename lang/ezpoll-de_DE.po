@@ -1,0 +1,137 @@
+# Copyright (C) 2020 Manuel Bazdong
+# This file is distributed under the same license as the EZ Poll plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: EZ Poll 1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ezpoll\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2020-10-27T15:49:18+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.4.0\n"
+"X-Domain: ezpoll\n"
+
+#. Plugin Name of the plugin
+msgid "EZ Poll"
+msgstr "EZ Poll"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://www.kickstart.ch"
+msgstr ""
+
+#. Description of the plugin
+msgid "A simplistic poll plugin"
+msgstr "Ein einfaches Plugin für Umfragen"
+
+#. Author of the plugin
+msgid "Manuel Bazdong"
+msgstr ""
+
+#: ezpoll.php:55
+msgid "Polls"
+msgstr "Umfragen"
+
+#: ezpoll.php:56
+msgid "Create Poll"
+msgstr "Neue Umfrage"
+
+#: ezpoll.php:57
+msgid "Edit Poll"
+msgstr "Umfrage bearbeiten"
+
+#: ezpoll.php:58
+msgid "Delete Poll"
+msgstr "Umfrage löschen"
+
+#: ezpoll.php:83
+msgid "Poll deleted."
+msgstr "Umfrage gelöscht."
+
+#: ezpoll.php:136
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Sie haben keine Berechtigung diese Seite anzuzeigen"
+
+#: ezpoll.php:162
+#: ezpoll.php:165
+msgid "Form error."
+msgstr "Formular fehler"
+
+#: ezpoll.php:190
+#: ezpoll.php:196
+msgid "Invalid poll id supplied"
+msgstr "Ungültige Umfrage ID übermittelt"
+
+#: ezpoll.php:208
+msgid "Participants"
+msgstr "Teilnehmer"
+
+#: ezpoll.php:211
+#: template/admin-list.php:80
+msgid "Delete"
+msgstr "Löschen"
+
+#: ezpoll.php:275
+msgid "Invalid ID"
+msgstr "Ungültige ID"
+
+#: template/admin-form.php:7
+#: template/admin-list.php:49
+#: template/frontend.php:2
+msgid "Poll"
+msgstr "Umfrage"
+
+#: template/admin-list.php:3
+msgid "Create poll"
+msgstr "Umfrage erstellen"
+
+#: template/admin-list.php:7
+msgid "Records"
+msgstr "Einträge"
+
+#: template/admin-list.php:14
+msgid "First page"
+msgstr "Erste Seite"
+
+#: template/admin-list.php:17
+msgid "Previous page"
+msgstr "Vorherige Seite"
+
+#: template/admin-list.php:21
+msgid "Current page"
+msgstr "Aktuelle Seite"
+
+#: template/admin-list.php:23
+msgid "of"
+msgstr "von"
+
+#: template/admin-list.php:30
+msgid "Next page"
+msgstr "Nächste Seite"
+
+#: template/admin-list.php:33
+msgid "Last page"
+msgstr "Letzte Seite"
+
+#: template/admin-list.php:44
+msgid "Date"
+msgstr "Datum"
+
+#: template/admin-list.php:54
+msgid "Results"
+msgstr "Einträge"
+
+#: template/admin-list.php:79
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: template/frontend.php:63
+msgid "people have participated"
+msgstr "Leute haben an der Umfrage teilgenommen"
+
+#: template/frontend.php:84
+msgid "Continue"
+msgstr "Weiter"

@@ -8,6 +8,11 @@
  * Author URI: https://www.kickstart.ch
  */
 
+add_action('plugins_loaded', 'ezpoll_load_textdomain');
+function ezpoll_load_textdomain() {
+ load_plugin_textdomain( 'ezpoll', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
+}
+
 global $ezpoll_db_version;
 $ezpoll_db_version = '1.0';
 register_activation_hook(__FILE__, 'ezpoll_install');
@@ -47,10 +52,10 @@ function ezpoll_install()
 add_action('admin_menu', 'ezpoll_menu');
 function ezpoll_menu()
 {
-    add_menu_page('Polls', 'Polls', 'manage_options', 'ezpoll_menu', 'ezpoll_overview', 'dashicons-chart-pie', 40);
-    add_submenu_page('ezpoll_menu', 'Create Poll', 'Create Poll', 'manage_options', 'ezpoll_create', 'ezpoll_create', 1);
-    add_submenu_page(null, 'Edit Poll', 'Edit Poll', 'manage_options', 'ezpoll_edit', 'ezpoll_create');
-    add_submenu_page(null, 'Delete Poll', 'Delete Poll', 'manage_options', 'ezpoll_delete', 'ezpoll_delete');
+    add_menu_page(__('Polls', 'ezpoll'), __('Polls', 'ezpoll'), 'manage_options', 'ezpoll_menu', 'ezpoll_overview', 'dashicons-chart-pie', 40);
+    add_submenu_page('ezpoll_menu', __('Create Poll', 'ezpoll'), __('Create Poll', 'ezpoll'), 'manage_options', 'ezpoll_create', 'ezpoll_create', 1);
+    add_submenu_page(null, __('Edit Poll', 'ezpoll'), __('Edit Poll', 'ezpoll'), 'manage_options', 'ezpoll_edit', 'ezpoll_create');
+    add_submenu_page(null, __('Delete Poll', 'ezpoll'), __('Delete Poll', 'ezpoll'), 'manage_options', 'ezpoll_delete', 'ezpoll_delete');
 }
 
 add_action('wp_enqueue_scripts', 'ezpoll_scripts');
@@ -65,7 +70,7 @@ function ezpoll_success()
     $id = $wpdb->insert_id;
     ?>
     <div class="notice notice-success is-dismissible">
-        <p><?php _e("Poll saved. Shortcode: [ezpoll id=\"$id\"]", "Poll saved. Shortcode: [ezpoll id=\"$id\"]"); ?></p>
+        <p><?php _e("Poll saved. Shortcode: [ezpoll id=\"$id\"]", 'ezpoll'); ?></p>
     </div>
     <?php
 }
@@ -75,7 +80,7 @@ function ezpoll_delete_success()
     global $wpdb;
     ?>
     <div class="notice notice-success is-dismissible">
-        <p><?php _e("Poll deleted."); ?></p>
+        <p><?php _e("Poll deleted.", 'ezpoll'); ?></p>
     </div>
     <?php
 }
@@ -128,7 +133,7 @@ function ezpoll_create()
     global $wpdb;
 
     if (!current_user_can('manage_options') ) {
-        wp_die(__('You do not have sufficient permissions to access this page.'));
+        wp_die(__('You do not have sufficient permissions to access this page.', 'ezpoll'));
     }
 
     $table_name = $wpdb->prefix . 'ezpoll';
@@ -154,10 +159,10 @@ function ezpoll_create()
         foreach(array('poll', 'choice1', 'choice2') as $key) {
             $post_key = 'ezpoll-' . $key;
             if (!isset($_POST[$post_key])) {
-                wp_die(__('Form error.'));
+                wp_die(__('Form error.', 'ezpoll'));
             }
             if (empty($_POST[$post_key])) {
-                wp_die(__('Form error.'));
+                wp_die(__('Form error.', 'ezpoll'));
             }
             $item[$key] = $_POST[$post_key];
         }
@@ -182,13 +187,13 @@ function ezpoll_delete()
     $table_name = $wpdb->prefix . 'ezpoll';
 
     if (!isset($_GET['ezpoll_id']) || empty($_GET['ezpoll_id']) || !preg_match('/^[0-9]+$/', $_GET['ezpoll_id'])) {
-        wp_die(__('Invalid poll id supplied'));
+        wp_die(__('Invalid poll id supplied', 'ezpoll'));
     }
     $poll_id = $_GET['ezpoll_id'];
 
     $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id");
     if (!$poll) {
-        wp_die(__('Invalid poll id supplied'));
+        wp_die(__('Invalid poll id supplied', 'ezpoll'));
     }
 
     if (isset($_POST['ezpoll_id']) && !empty($_POST['ezpoll_id']) && $_POST['ezpoll_id'] == $poll_id) {
@@ -200,10 +205,10 @@ function ezpoll_delete()
 
     ?>
   <h1>Poll: <?php echo $poll->poll; ?></h1> 
-  <p><?php echo $poll->answer_count; ?> Antworten</p>
+  <p><?php echo $poll->answer_count; ?> <?php _e('Participants', 'ezpoll') ?></p>
   <form method="post">
     <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>"/>
-    <?php wp_nonce_field(); submit_button('Delete'); ?>
+    <?php wp_nonce_field(); submit_button(__('Delete', 'ezpoll')); ?>
   </form>
 <?php } ?>
 
@@ -217,17 +222,6 @@ function register_session()
 }
 add_action('init', 'register_session');
 
-function random_id()
-{
-    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $max = strlen($chars) - 1;
-    $id = '';
-    for ($i = 0; $i < 16; $i++) {
-        $id .= $chars[rand(0, $max)];
-    }
-    return $id;
-}
-
 add_action('admin_post_ezpoll_form_data', 'ezpoll_form_data');
 function ezpoll_form_data()
 {
@@ -236,7 +230,6 @@ function ezpoll_form_data()
 
     foreach(array('ezpoll_id', 'ezpoll_answer') as $key) {
         if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]$/', $_POST[$key])) {
-            exit;
             wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
         }
     }
@@ -244,13 +237,11 @@ function ezpoll_form_data()
     $poll_id = $_POST['ezpoll_id'];
     $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id", ARRAY_A);
     if (!$poll) {
-        exit;
         wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
     }
 
     $answer = $_POST['ezpoll_answer'];
     if ($answer < 1 || $answer > 5) {
-        exit;
         wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
     }
 
@@ -281,13 +272,13 @@ add_shortcode(
         $table_name = $wpdb->prefix . 'ezpoll';
 
         if (!isset($attrs['id']) || empty($attrs['id']) || !preg_match('/^[0-9]+$/', $attrs['id'])) {
-            return '<p class="error">Invalid ID</p>';
+            return '<p class="error">' . __('Invalid ID', 'ezpoll') . '</p>';
         }
 
         $poll_id = $attrs['id'];
         $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id");
         if (!$poll) {
-            return "<p class=\"error\">Poll id=$poll_id not found</p>";
+            return "<p class=\"error\">" . __("Poll id=$poll_id not found", 'ezpoll') . "</p>";
         }
 
         if (!isset($_SESSION['ezpoll']) || empty($_SESSION['ezpoll'])) {

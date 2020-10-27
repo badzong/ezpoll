@@ -1,5 +1,5 @@
 <div class="ezpoll">
-  <h4>Umfrage</h4>
+  <h4><?php _e('Poll', 'ezpoll'); ?></h4>
   <p><?php echo $poll->poll; ?><p>
   <?php if ($show_results): ?>
     <table>
@@ -60,7 +60,7 @@
       <?php endif; ?>
     </table>
     <div class="ezpoll-participants">
-      <?php echo $poll->answer_count < 10? '< 10': $poll->answer_count; ?> Personen haben an der Umfrage teilgenommen
+      <?php echo $poll->answer_count < 10? '< 10': $poll->answer_count; ?> <?php _e('people have participated', 'ezpoll'); ?>
     </div>
   <?php else: ?>
     <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
@@ -81,7 +81,7 @@
         <div><input type="radio" name="ezpoll_answer" value="5" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice5; ?></label></div>
       <?php endif; ?>
       <?php wp_nonce_field(); ?>
-      <button type="submit">Weiter</button>
+      <button type="submit"><?php _e('Continue', 'ezpoll'); ?></button>
     </form>
   <?php endif; ?>
 </div>

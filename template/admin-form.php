@@ -4,7 +4,7 @@
     <div>
       <table class="form-table" role="presentation" id="createuser">
         <tr class="form-field form-required">
-          <th><label>Poll</label></th>
+          <th><label><?php _e('Poll', 'ezpoll') ?></label></th>
           <td><input type="text" name="ezpoll-poll" value="<?php echo $item['poll'] ?>"/></td>
         </tr>
         <tr class="form-field form-required">
