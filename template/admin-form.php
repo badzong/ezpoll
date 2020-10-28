@@ -11,15 +11,15 @@
       <table class="form-table" role="presentation" id="createuser">
         <tr class="form-field form-required">
           <th><label><?php _e('Poll', 'ezpoll') ?></label></th>
-          <td><input type="text" name="ezpoll-poll" value="<?php echo $item['poll'] ?>"/></td>
+          <td><textarea name="ezpoll-poll" style="width: auto" rows="5" cols="40" required /><?php echo $item['poll'] ?></textarea></td>
         </tr>
         <tr class="form-field form-required">
           <th><label>#1</label></th>
-          <td><input type="text" name="ezpoll-choice1" value="<?php echo $item['choice1'] ?>"/></td>
+          <td><input type="text" name="ezpoll-choice1" value="<?php echo $item['choice1'] ?>" required /></td>
         </tr>
         <tr class="form-field form-required">
           <th><label>#2</label></th>
-          <td><input type="text" name="ezpoll-choice2" value="<?php echo $item['choice2'] ?>"/></td>
+          <td><input type="text" name="ezpoll-choice2" value="<?php echo $item['choice2'] ?>" required /></td>
         </tr>
         <tr class="form-field">
           <th><label>#3</label></th>
