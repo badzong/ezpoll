@@ -66,7 +66,7 @@
             </a>
           </strong>
           <div class="row-actions">
-            <span><strong style="color: #555">[ezpoll id="<?php echo $poll->id; ?>]</strong></span>
+            <span><strong style="color: #555">[ezpoll id="<?php echo $poll->id; ?>"]</strong></span>
           </div>
         </td>
         <td class="has-row-actions column-primary">
