@@ -57,7 +57,10 @@
       </tr>
     </thead>
     <tbody id="the-list">
-      <?php foreach ( $polls as $poll ): ?>
+      <?php
+        foreach ( $polls as $poll ):
+          $shortcode = "[ezpoll id=$poll->id]";
+      ?>
       <tr id="poll-<?php echo $poll->id ?>">
         <td class="has-row-actions">
           <strong>
@@ -66,7 +69,12 @@
             </a>
           </strong>
           <div class="row-actions">
-            <span><strong style="color: #555">[ezpoll id="<?php echo $poll->id; ?>"]</strong></span>
+            <span>
+              <a href="javascript: navigator.clipboard.writeText('<?php echo $shortcode; ?>').then(function() { }, function() { alert('Failed'); });">
+                <strong style="color: #555"><?php echo $shortcode; ?></strong>
+                <span alt="f105" class="dashicons dashicons-admin-page"></span>
+              </a>
+            </span>
           </div>
         </td>
         <td class="has-row-actions column-primary">
