@@ -274,31 +274,36 @@ function ezpoll_form_data()
     global $wpdb;
     $table_name = $wpdb->prefix . 'ezpoll';
 
+    $url = $_POST['ezpoll_url'];
+    if (empty($url)) {
+      $url = $_SERVER["HTTP_REFERER"];
+    }
+
     foreach(array('ezpoll_id', 'ezpoll_answer') as $key) {
         if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]$/', $_POST[$key])) {
-            wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+            wp_redirect($url, 302, 'WordPress');
         }
     }
 
     $poll_id = intval($_POST['ezpoll_id']);
     $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id", ARRAY_A);
     if (!$poll) {
-        wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+        wp_redirect($url, 302, 'WordPress');
     }
 
     $answer = $_POST['ezpoll_answer'];
     if ($answer < 1 || $answer > 5) {
-        wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+        wp_redirect($url, 302, 'WordPress');
     }
 
     $choice = 'choice' . $answer;
     if (!$poll[$choice]) {
-        wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+        wp_redirect($url, 302, 'WordPress');
     }
 
     ezpoll_session_load();
     if (in_array($poll_id, $ezpoll_session)) {
-        wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+        wp_redirect($url, 302, 'WordPress');
     }
 
     $answer = 'answer' . $answer;
@@ -306,13 +311,16 @@ function ezpoll_form_data()
 
     ezpoll_session_save($poll_id);
 
-    wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
+    $url = $url . '#ezpoll-' . $poll_id;
+    wp_redirect($url, 302, 'WordPress');
 }
 
 add_shortcode(
     'ezpoll', function ($attrs) {
         global $ezpoll_session;
         global $wpdb;
+        global $wp;
+
         $table_name = $wpdb->prefix . 'ezpoll';
 
         if (!isset($attrs['id']) || empty($attrs['id']) || !preg_match('/^[0-9]+$/', $attrs['id'])) {
@@ -336,6 +344,8 @@ add_shortcode(
             round($poll->answer5 / $poll->answer_count * 100),
             );
         }
+
+        $url = home_url( $wp->request );
 
         ob_start();
         include plugin_dir_path(__FILE__) . 'template/frontend.php';

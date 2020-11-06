@@ -1,4 +1,4 @@
-<div class="ezpoll">
+<div class="ezpoll" id="ezpoll-<?php echo $poll->id; ?>">
   <h4><?php echo $poll->poll; ?></h4>
   <div class="ezpoll-wrap">
     <?php if ($show_results): ?>
@@ -65,6 +65,7 @@
     <?php else: ?>
       <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
         <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
+        <input type="hidden" name="ezpoll_url" value="<?php echo $url; ?>" />
         <?php if ($poll->choice1): ?>
           <div><input type="radio" name="ezpoll_answer" value="1" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice1; ?></label></div>
         <?php endif; ?>
