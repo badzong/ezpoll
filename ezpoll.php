@@ -8,6 +8,56 @@
  * Author URI: https://www.kickstart.ch
  */
 
+define('EZPOLL_SEP', 'x');
+define('EZPOLL_HISTORY', 15);
+
+function ezpoll_session_checksum($session) {
+    $checksum = 47;
+    foreach($session as $poll_id) {
+        $checksum *= ($poll_id * 33) >> 2;
+    }
+
+    return $checksum % 100;
+}
+
+function ezpoll_session_load() {
+    global $ezpoll_session;
+
+    if (isset($ezpoll_session) && count($ezpoll_session)) {
+        return;
+    }
+    
+    $ezpoll_session = array();
+    if (!isset($_COOKIE['ezpoll']) || empty($_COOKIE['ezpoll'])) {
+        return;
+    }
+
+    $poll_ids = explode(EZPOLL_SEP, $_COOKIE['ezpoll']);
+
+    foreach($poll_ids as $poll_id) {
+        if(preg_match('/^[0-9]+$/', $poll_id)) {
+            array_push($ezpoll_session, intval($poll_id));
+        }
+    }
+
+    $checksum = array_pop($ezpoll_session);
+    if ($checksum == ezpoll_session_checksum($ezpoll_session)) {
+        $ezpoll_session = array_unique($ezpoll_session);
+    } else {
+        $ezpoll_session = array();
+    }
+}
+
+function ezpoll_session_save($poll_id) {
+    global $ezpoll_session;
+
+    $ids = $ezpoll_session;
+    array_push($ids, $poll_id);
+    $ids = array_slice(array_unique($ids), -EZPOLL_HISTORY);
+    array_push($ids, ezpoll_session_checksum($ids));
+    setcookie('ezpoll', implode(EZPOLL_SEP, $ids), time()+15552000, '/');
+}
+
 add_action('plugins_loaded', 'ezpoll_load_textdomain');
 function ezpoll_load_textdomain() {
  load_plugin_textdomain( 'ezpoll', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
@@ -216,17 +266,11 @@ function ezpoll_delete()
 
 <?php
 
-function register_session()
-{
-    if(!session_id() ) {
-        session_start();
-    }
-}
-add_action('init', 'register_session');
-
 add_action('admin_post_ezpoll_form_data', 'ezpoll_form_data');
+add_action('admin_post_nopriv_ezpoll_form_data', 'ezpoll_form_data');
 function ezpoll_form_data()
 {
+    global $ezpoll_session;
     global $wpdb;
     $table_name = $wpdb->prefix . 'ezpoll';
 
@@ -236,7 +280,7 @@ function ezpoll_form_data()
         }
     }
 
-    $poll_id = $_POST['ezpoll_id'];
+    $poll_id = intval($_POST['ezpoll_id']);
     $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id", ARRAY_A);
     if (!$poll) {
         wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
@@ -252,24 +296,22 @@ function ezpoll_form_data()
         wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
     }
 
-    if (!isset($_SESSION['ezpoll']) || empty($_SESSION['ezpoll'])) {
+    ezpoll_session_load();
+    if (in_array($poll_id, $ezpoll_session)) {
         wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
     }
 
-    if (in_array($poll_id, $_SESSION['ezpoll'])) {
-        wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
-    }
-
-    array_push($_SESSION['ezpoll'], $poll_id);
     $answer = 'answer' . $answer;
-  
     $wpdb->query("UPDATE $table_name SET $answer = $answer + 1, answer_count = answer_count + 1 WHERE ID = $poll_id ");
+
+    ezpoll_session_save($poll_id);
 
     wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
 }
 
 add_shortcode(
     'ezpoll', function ($attrs) {
+        global $ezpoll_session;
         global $wpdb;
         $table_name = $wpdb->prefix . 'ezpoll';
 
@@ -283,11 +325,8 @@ add_shortcode(
             return "<p class=\"error\">" . __("Poll id=$poll_id not found", 'ezpoll') . "</p>";
         }
 
-        if (!isset($_SESSION['ezpoll']) || empty($_SESSION['ezpoll'])) {
-            $_SESSION['ezpoll'] = array(0);
-        }
-
-        $show_results = in_array($poll_id, $_SESSION['ezpoll']) && $poll->answer_count > 0;
+        ezpoll_session_load();
+        $show_results = in_array($poll_id, $ezpoll_session) && $poll->answer_count > 0;
         if ($poll->answer_count > 0) {
             $results = array(
             round($poll->answer1 / $poll->answer_count * 100),
