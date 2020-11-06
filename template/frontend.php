@@ -67,19 +67,19 @@
         <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
         <input type="hidden" name="ezpoll_url" value="<?php echo $url; ?>" />
         <?php if ($poll->choice1): ?>
-          <div><input type="radio" name="ezpoll_answer" value="1" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice1; ?></label></div>
+          <div><input type="radio" name="ezpoll_answer" value="1" id="ezpoll-answer-1" required> <label for="ezpoll-answer-1"><?php echo $poll->choice1; ?></label></div>
         <?php endif; ?>
         <?php if ($poll->choice2): ?>
-          <div><input type="radio" name="ezpoll_answer" value="2" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice2; ?></label></div>
+          <div><input type="radio" name="ezpoll_answer" value="2" id="ezpoll-answer-2" required> <label for="ezpoll-answer-2"><?php echo $poll->choice2; ?></label></div>
         <?php endif; ?>
         <?php if ($poll->choice3): ?>
-          <div><input type="radio" name="ezpoll_answer" value="3" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice3; ?></label></div>
+          <div><input type="radio" name="ezpoll_answer" value="3" id="ezpoll-answer-3" required> <label for="ezpoll-answer-3"><?php echo $poll->choice3; ?></label></div>
         <?php endif; ?>
         <?php if ($poll->choice4): ?>
-          <div><input type="radio" name="ezpoll_answer" value="4" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice4; ?></label></div>
+          <div><input type="radio" name="ezpoll_answer" value="4" id="ezpoll-answer-4" required> <label for="ezpoll-answer-4"><?php echo $poll->choice4; ?></label></div>
         <?php endif; ?>
         <?php if ($poll->choice5): ?>
-          <div><input type="radio" name="ezpoll_answer" value="5" required> <label onclick="this.parentNode.querySelector('input').click()"><?php echo $poll->choice5; ?></label></div>
+          <div><input type="radio" name="ezpoll_answer" value="5" id="ezpoll-answer-5" required> <label for="ezpoll-answer-5"><?php echo $poll->choice5; ?></label></div>
         <?php endif; ?>
         <?php wp_nonce_field(); ?>
         <button type="submit"><?php _e('Continue', 'ezpoll'); ?></button>
