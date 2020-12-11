@@ -2,6 +2,7 @@
   "name": "badzong/ezpoll",
   "type": "wordpress-plugin",
   "description": "Simplistic poll plugin for Wordpress",
+  "version": "1.0.0",
   "license": "MIT",
   "require": {
     "php": ">=7.2"

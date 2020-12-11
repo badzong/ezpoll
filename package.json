@@ -1,6 +1,7 @@
 {
   "name": "ezpoll",
   "description": "Simplistic poll plugin for Wordpress",
+  "version": "1.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
