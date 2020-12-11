@@ -1,0 +1,9 @@
+{
+  "name": "badzong/ezpoll",
+  "type": "wordpress-plugin",
+  "description": "Simplistic poll plugin for Wordpress",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.2"
+  },
+}
