@@ -126,8 +126,12 @@ msgstr "Bearbeiten"
 
 #: template/frontend.php:63
 msgid "people have participated"
-msgstr "Leute haben an der Umfrage teilgenommen"
+msgstr "Personen haben an der Umfrage teilgenommen"
 
 #: template/frontend.php:84
 msgid "Continue"
 msgstr "Weiter"
+
+#: template/frontend.php:64
+msgid "rounding difference"
+msgstr "Rundungsdifferenz"

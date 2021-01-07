@@ -334,6 +334,7 @@ add_shortcode(
         }
 
         ezpoll_session_load();
+        $round_diff = 0;
         $show_results = in_array($poll_id, $ezpoll_session) && $poll->answer_count > 0;
         if ($poll->answer_count > 0) {
             $results = array(
@@ -343,6 +344,7 @@ add_shortcode(
             round($poll->answer4 / $poll->answer_count * 100),
             round($poll->answer5 / $poll->answer_count * 100),
             );
+            $round_diff = abs(100-array_sum($results));
         }
 
         $url = home_url( $wp->request );

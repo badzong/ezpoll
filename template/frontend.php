@@ -61,6 +61,7 @@
       </table>
       <div class="ezpoll-participants">
         <?php echo $poll->answer_count < 10? '< 10': $poll->answer_count; ?> <?php _e('people have participated', 'ezpoll'); ?>
+        <?php if($round_diff) echo "(" . $round_diff . "%" . _e('rounding difference', 'ezpoll') . ")"; ?>
       </div>
     <?php else: ?>
       <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
