@@ -60,8 +60,8 @@
         <?php endif; ?>
       </table>
       <div class="ezpoll-participants">
-        <?php echo $poll->answer_count < 10? '< 10': number_format($poll->answer_count, 0, '.', "'"); ?> <?php _e('people have participated', 'ezpoll'); ?><?php if($round_diff): ?>*<?php endif; ?>
-       <?php if($round_diff): ?><div style="text-align: right"><small>* <?php echo $round_diff; ?>% <?php _e('rounding difference', 'ezpoll'); ?></small></div><?php endif; ?>
+        <?php echo $poll->answer_count < 10? '< 10': number_format($poll->answer_count, 0, '.', "'"); ?> <?php _e('people have participated', 'ezpoll'); ?>
+        <?php if($round_diff): ?><div><small><?php echo $round_diff; ?>% <?php _e('rounding difference', 'ezpoll'); ?></small></div><?php endif; ?>
       </div>
     <?php else: ?>
       <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
