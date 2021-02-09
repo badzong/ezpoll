@@ -290,9 +290,7 @@ function ezpoll_delete()
     <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>"/>
     <?php wp_nonce_field(); submit_button(__('Delete', 'ezpoll')); ?>
   </form>
-<?php } ?>
-
-<?php
+<?php }
 
 function ezpoll_process_form()
 {
