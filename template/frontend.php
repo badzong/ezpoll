@@ -64,7 +64,9 @@
         <?php if($round_diff): ?><div><small><?php echo $round_diff; ?>% <?php _e('rounding difference', 'ezpoll'); ?></small></div><?php endif; ?>
       </div>
     <?php else: ?>
-      <form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>?action=ezpoll_form_data" method="post">
+      <form class="ezpoll-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ) ?>" method="post">
+        <?php wp_nonce_field(); ?>
+        <input type="hidden" name="action" value="ezpoll_form_data" />
         <input type="hidden" name="ezpoll_id" value="<?php echo $poll->id; ?>" />
         <input type="hidden" name="ezpoll_url" value="<?php echo $url; ?>" />
         <?php if ($poll->choice1): ?>
@@ -82,7 +84,6 @@
         <?php if ($poll->choice5): ?>
           <div><input type="radio" name="ezpoll_answer" value="5" id="ezpoll-answer-5" required> <label for="ezpoll-answer-5"><?php echo $poll->choice5; ?></label></div>
         <?php endif; ?>
-        <?php wp_nonce_field(); ?>
         <button type="submit"><?php _e('Continue', 'ezpoll'); ?></button>
       </form>
     <?php endif; ?>

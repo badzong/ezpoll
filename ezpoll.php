@@ -20,6 +20,34 @@ function ezpoll_session_checksum($session) {
     return $checksum % 100;
 }
 
+add_action('wp_footer', function () {
+?>
+	<script>
+		document.addEventListener('DOMContentLoaded', function(){ 
+ 			jQuery('.ezpoll-form').submit(function () {
+				event.preventDefault();
+				var ezpoll_id = jQuery(this).find('input[name=ezpoll_id]').val();
+				var serialized = jQuery(this).serialize();
+				jQuery.ajax({
+					action:  "ezpoll_form_data",
+					type:    "POST",
+					url:     "<?php echo admin_url('admin-ajax.php'); ?>",
+					data:    serialized,
+					dataType: 'html',
+					success: function(data) {
+						var selector = '#ezpoll-' + ezpoll_id;
+						var elem = jQuery( document ).find(selector);
+						elem.slideUp(500, function() {
+							elem.replaceWith(data);
+							jQuery( document ).find(selector).hide().slideDown(500);
+						});
+					}
+				});
+			});
+		});
+	</script>
+<?php });
+
 function ezpoll_session_load() {
     global $ezpoll_session;
 
@@ -266,44 +294,37 @@ function ezpoll_delete()
 
 <?php
 
-add_action('admin_post_ezpoll_form_data', 'ezpoll_form_data');
-add_action('admin_post_nopriv_ezpoll_form_data', 'ezpoll_form_data');
-function ezpoll_form_data()
+function ezpoll_process_form()
 {
     global $ezpoll_session;
     global $wpdb;
     $table_name = $wpdb->prefix . 'ezpoll';
 
-    $url = $_POST['ezpoll_url'];
-    if (empty($url)) {
-      $url = $_SERVER["HTTP_REFERER"];
-    }
-
     foreach(array('ezpoll_id', 'ezpoll_answer') as $key) {
         if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]$/', $_POST[$key])) {
-            wp_redirect($url, 302, 'WordPress');
+            return false;
         }
     }
 
     $poll_id = intval($_POST['ezpoll_id']);
     $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id", ARRAY_A);
     if (!$poll) {
-        wp_redirect($url, 302, 'WordPress');
+        return false;
     }
 
     $answer = $_POST['ezpoll_answer'];
     if ($answer < 1 || $answer > 5) {
-        wp_redirect($url, 302, 'WordPress');
+        return false;
     }
 
     $choice = 'choice' . $answer;
     if (!$poll[$choice]) {
-        wp_redirect($url, 302, 'WordPress');
+        return false;
     }
 
     ezpoll_session_load();
     if (in_array($poll_id, $ezpoll_session)) {
-        wp_redirect($url, 302, 'WordPress');
+        return false;
     }
 
     $answer = 'answer' . $answer;
@@ -311,47 +332,76 @@ function ezpoll_form_data()
 
     ezpoll_session_save($poll_id);
 
+    return true;
+}
+
+add_action('admin_post_ezpoll_form_data', 'ezpoll_form_data');
+add_action('admin_post_nopriv_ezpoll_form_data', 'ezpoll_form_data');
+function ezpoll_form_data()
+{
+    $url = $_POST['ezpoll_url'];
+    if (empty($url)) {
+      $url = $_SERVER["HTTP_REFERER"];
+    }
+
+    if ( !ezpoll_process_form() ) {
+        wp_redirect($url, 302, 'WordPress');
+    }
+
     $url = $url . '#ezpoll-' . $poll_id;
     wp_redirect($url, 302, 'WordPress');
 }
 
-add_shortcode(
-    'ezpoll', function ($attrs) {
-        global $ezpoll_session;
-        global $wpdb;
-        global $wp;
-
-        $table_name = $wpdb->prefix . 'ezpoll';
-
-        if (!isset($attrs['id']) || empty($attrs['id']) || !preg_match('/^[0-9]+$/', $attrs['id'])) {
-            return '<p class="error">' . __('Invalid ID', 'ezpoll') . '</p>';
+add_action( 'wp_ajax_ezpoll_form_data', 'ezpoll_ajax_form_data');
+add_action( 'wp_ajax_nopriv_ezpoll_form_data', 'ezpoll_ajax_form_data');
+function ezpoll_ajax_form_data() {
+	if ( !isset($_REQUEST['ezpoll_id']) || !check_ajax_referer() || !ezpoll_process_form() ) {
+		echo 'ERROR';
+                exit();
         }
 
-        $poll_id = $attrs['id'];
-        $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id");
-        if (!$poll) {
-            return "<p class=\"error\">" . __("Poll id=$poll_id not found", 'ezpoll') . "</p>";
-        }
+    	$poll_id = intval($_REQUEST['ezpoll_id']);
+	echo ezpoll_shortcode(['id' => $poll_id], true);
+	exit();
+}
 
-        ezpoll_session_load();
-        $round_diff = 0;
-        $show_results = in_array($poll_id, $ezpoll_session) && $poll->answer_count > 0;
-        if ($poll->answer_count > 0) {
-            $results = array(
-            round($poll->answer1 / $poll->answer_count * 100),
-            round($poll->answer2 / $poll->answer_count * 100),
-            round($poll->answer3 / $poll->answer_count * 100),
-            round($poll->answer4 / $poll->answer_count * 100),
-            round($poll->answer5 / $poll->answer_count * 100),
-            );
-            $round_diff = abs(100-array_sum($results));
-        }
+add_shortcode( 'ezpoll', 'ezpoll_shortcode');
+function ezpoll_shortcode($attrs, $show_results=false) {
+    global $ezpoll_session;
+    global $wpdb;
+    global $wp;
 
-        $url = home_url( $wp->request );
+    $table_name = $wpdb->prefix . 'ezpoll';
 
-        ob_start();
-        include plugin_dir_path(__FILE__) . 'template/frontend.php';
-        return ob_get_clean();
+    if (!isset($attrs['id']) || empty($attrs['id']) || !preg_match('/^[0-9]+$/', $attrs['id'])) {
+        return '<p class="error">' . __('Invalid ID', 'ezpoll') . '</p>';
     }
-);
+
+    $poll_id = $attrs['id'];
+    $poll = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $poll_id");
+    if (!$poll) {
+        return "<p class=\"error\">" . __("Poll id=$poll_id not found", 'ezpoll') . "</p>";
+    }
+
+    ezpoll_session_load();
+    $round_diff = 0;
+    $show_results = $show_results || in_array($poll_id, $ezpoll_session) && $poll->answer_count > 0;
+    //$show_results = false;
+    if ($poll->answer_count > 0) {
+        $results = array(
+        round($poll->answer1 / $poll->answer_count * 100),
+        round($poll->answer2 / $poll->answer_count * 100),
+        round($poll->answer3 / $poll->answer_count * 100),
+        round($poll->answer4 / $poll->answer_count * 100),
+        round($poll->answer5 / $poll->answer_count * 100),
+        );
+        $round_diff = abs(100-array_sum($results));
+    }
+
+    $url = home_url( $wp->request );
+
+    ob_start();
+    include plugin_dir_path(__FILE__) . 'template/frontend.php';
+    return ob_get_clean();
+}
 ?>
