@@ -84,7 +84,7 @@
         <?php if ($poll->choice5): ?>
           <div><input type="radio" name="ezpoll_answer" value="5" id="ezpoll-answer-5" required> <label for="ezpoll-answer-5"><?php echo $poll->choice5; ?></label></div>
         <?php endif; ?>
-        <button type="submit" class="button"><?php _e('Continue', 'ezpoll'); ?></button>
+        <button type="submit" class="submit"><?php _e('Continue', 'ezpoll'); ?></button>
       </form>
     <?php endif; ?>
   </div>
