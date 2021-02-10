@@ -34,7 +34,7 @@
 .ezpoll th {
   width: 10%;
   color: rgb(1, 62, 131);
-  color: var(--color-blue-dark);
+  color: var(--color-link);
   font-weight: 600;  
   text-align: left;
   padding-right: 10px;
