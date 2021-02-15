@@ -299,7 +299,7 @@ function ezpoll_process_form()
     $table_name = $wpdb->prefix . 'ezpoll';
 
     foreach(array('ezpoll_id', 'ezpoll_answer') as $key) {
-        if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]$/', $_POST[$key])) {
+        if (!isset($_POST[$key]) || empty($_POST[$key]) || !preg_match('/^[0-9]+$/', $_POST[$key])) {
             return false;
         }
     }
